@@ -6,7 +6,7 @@
   <title><?= $title ?></title>
 
   <!-- AdminLTE CSS -->
-  <link rel="stylesheet" href="<?= base_url('aset/plugin/fontawesome-free/css/all.min.css') ?>" />
+  <link rel="stylesheet" href="<?= base_url('aset/plugins/fontawesome-free/css/all.min.css') ?>" />
   <link rel="stylesheet" href="<?= base_url('aset/dist/css/adminlte.min.css') ?>" />
 
   <style>
@@ -156,8 +156,8 @@
   </div>
 
   <!-- JS -->
-  <script src="<?= base_url('aset/plugin/jquery/jquery.min.js') ?>"></script>
-  <script src="<?= base_url('aset/plugin/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+  <script src="<?= base_url('aset/plugins/jquery/jquery.min.js') ?>"></script>
+  <script src="<?= base_url('aset/plugins/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
   <script src="<?= base_url('aset/dist/js/adminlte.min.js') ?>"></script>
 
   <script>

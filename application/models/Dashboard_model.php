@@ -23,7 +23,7 @@ class Dashboard_model extends CI_Model {
         return $summary;
     }
 
-    // Ambil semua file (bisa difilter berdasarkan jenis_paket kalau diperlukan)
+    // Ambil semua file (bisa difilter berdasarkan jenis_paket)
     public function get_all($jenis_paket = null) {
         if (!empty($jenis_paket)) {
             $this->db->where('jenis_paket', $jenis_paket);
@@ -33,17 +33,33 @@ class Dashboard_model extends CI_Model {
         return $this->db->get('file_uploads')->result();
     }
 
-    // Ambil data file berdasarkan subkategori dan tahun (khusus untuk jenis 'Air Limbah')
-    public function get_filtered($subkategori = '', $tahun = '') {
+    // Simpan file yang diunggah ke database
+    public function insert_file($data) {
+        return $this->db->insert('file_uploads', $data);
+    }
+
+    // Ambil tahun-tahun unik berdasarkan subkategori (khusus Air Limbah)
+    public function get_tahun_by_subkategori($subkategori) {
+        $this->db->select('tahun');
+        $this->db->from('file_uploads');
+        $this->db->where('jenis_paket', 'Air Limbah');
+        $this->db->where('subkategori', $subkategori);
+        $this->db->group_by('tahun');
+        $this->db->order_by('tahun', 'DESC');
+        return $this->db->get()->result();
+    }
+
+    // Filter data berdasarkan subkategori dan tahun (khusus Air Limbah)
+    public function filter_by_subkategori_and_tahun($subkategori, $tahun) {
         $this->db->from('file_uploads');
         $this->db->where('jenis_paket', 'Air Limbah');
 
         if (!empty($subkategori)) {
-            $this->db->where('sub_jenis_paket', $subkategori);
+            $this->db->where('subkategori', $subkategori);
         }
 
         if (!empty($tahun)) {
-            $this->db->where('tahun_paket', $tahun);
+            $this->db->where('tahun', $tahun);
         }
 
         $this->db->order_by('id', 'DESC');
