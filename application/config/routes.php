@@ -54,3 +54,4 @@ $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 $route['file/upload'] = 'file/upload';
 $route['file/do_upload'] = 'file/do_upload';
+$route['file/delete/(:num)'] = 'file/delete/$1';

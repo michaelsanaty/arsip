@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload File</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="<?= base_url('aset/plugins/fontawesome-free/css/all.min.css') ?>">
   <link rel="stylesheet" href="<?= base_url('aset/dist/css/adminlte.min.css') ?>">
   <script src="<?= base_url('aset/plugins/jquery/jquery.min.js') ?>"></script>
@@ -44,21 +44,16 @@
           </select>
         </div>
 
-        <!-- Subkategori -->
-        <div class="form-group" id="subJenisGroup" style="display:none;">
-          <label><i class="fas fa-filter mr-1"></i> Subkategori</label>
-          <select name="subkategori" class="form-control" id="subKategoriSelect">
+        <div class="form-group" id="subkategoriGroup" style="display: none;">
+          <label><i class="fas fa-tags mr-1"></i> Subkategori</label>
+          <select name="subkategori" class="form-control" id="subkategoriSelect">
             <option value="">-- Pilih Subkategori --</option>
-            <option value="Gedung Sekolah">Gedung Sekolah</option>
-            <option value="Gedung Kantor">Gedung Kantor</option>
-            <option value="Fasilitas Kesehatan">Fasilitas Kesehatan</option>
           </select>
         </div>
 
-        <!-- Tahun Konstruksi -->
-        <div class="form-group" id="tahunGroup" style="display:none;">
+        <div class="form-group" id="tahunGroup" style="display: none;">
           <label><i class="fas fa-calendar-alt mr-1"></i> Tahun Konstruksi</label>
-          <select name="tahun_konstruksi" class="form-control form-control-sm" id="tahunKonstruksi">
+          <select name="tahun_konstruksi" class="form-control" required>
             <option value="">-- Pilih Tahun --</option>
             <?php for ($i = 2015; $i <= 2025; $i++): ?>
               <option value="<?= $i ?>"><?= $i ?></option>
@@ -69,11 +64,6 @@
         <div class="form-group">
           <label><i class="fas fa-pen-nib mr-1"></i> Nama Paket</label>
           <input type="text" name="nama_paket" class="form-control" required>
-        </div>
-
-        <div class="form-group">
-          <label><i class="fas fa-calendar-alt mr-1"></i> Tahun</label>
-          <input type="number" name="tahun" class="form-control" min="2010" max="2030" required>
         </div>
 
         <div class="form-group">
@@ -115,26 +105,43 @@
   </div>
 </div>
 
-<!-- Script Dinamis -->
 <script>
-$(document).ready(function() {
-  $('#jenisPaket').change(function() {
-    const selected = $(this).val();
+  const subkategoriMap = {
+    'Air Limbah': ['MCK', 'Tangki Septik'],
+    // 'Jasa Konstruksi': ['Gedung', 'Jalan', 'Jembatan']  // subkategori Jasa Konstruksi dihilangkan
+  };
 
-    const $subGroup = $('#subJenisGroup');
-    const $tahunGroup = $('#tahunGroup');
+  $('#jenisPaket').on('change', function () {
+    const val = $(this).val();
+    const subkategoriGroup = $('#subkategoriGroup');
+    const subkategoriSelect = $('#subkategoriSelect');
+    const tahunGroup = $('#tahunGroup');
 
-    if (selected === 'Jasa Konstruksi') {
-      $subGroup.slideDown();
-      $tahunGroup.slideDown();
+    subkategoriSelect.empty().append('<option value="">-- Pilih Subkategori --</option>');
+
+    if (val === 'Air Limbah') {
+      subkategoriGroup.show();
+      subkategoriMap['Air Limbah'].forEach(function (item) {
+        subkategoriSelect.append(`<option value="${item}">${item}</option>`);
+      });
+      tahunGroup.hide();  // sembunyikan dulu, akan muncul jika subkategori dipilih
+    } else if (val === 'Jasa Konstruksi') {
+      subkategoriGroup.hide();
+      tahunGroup.show();  // langsung tampilkan tahun konstruksi
     } else {
-      $subGroup.slideUp();
-      $tahunGroup.slideUp();
-      $('#subKategoriSelect').val('');
-      $('#tahunKonstruksi').val('');
+      subkategoriGroup.hide();
+      tahunGroup.hide();
     }
   });
-});
+
+  $('#subkategoriSelect').on('change', function () {
+    const val = $(this).val();
+    if (val) {
+      $('#tahunGroup').fadeIn(200);
+    } else {
+      $('#tahunGroup').fadeOut(200);
+    }
+  });
 </script>
 </body>
 </html>
