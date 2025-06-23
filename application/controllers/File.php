@@ -49,13 +49,13 @@ class File extends CI_Controller {
             'subkategori'      => $subkategori,
             'tahun_konstruksi' => $tahun_konstruksi,
             'nama_paket'       => $this->input->post('nama_paket'),
-            'tahun_paket' => $this->input->post('tahun'),
+            'tahun_paket'      => $this->input->post('tahun'),
             'sumber_dana'      => $this->input->post('sumber_dana'),
             'nilai_paket'      => $this->input->post('nilai_paket'),
             'nilai_pagu'       => $this->input->post('nilai_pagu'),
             'tgl_upload'       => $this->input->post('tanggal'),
             'volume'           => $this->input->post('volume'),
-            'file'             => $file['file_name'],
+            'file_upload'      => $file['file_name'], // ✅ Fix error di sini
             'created_at'       => date('Y-m-d H:i:s'),
         ];
 
