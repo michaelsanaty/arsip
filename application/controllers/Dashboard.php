@@ -6,18 +6,23 @@ class Dashboard extends CI_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('Dashboard_model');
+        $this->load->helper(['url', 'form']);
     }
 
     public function index() {
-        $subkategori = $this->input->get('subkategori');
-        $tahun = $this->input->get('tahun');
+        // Ambil filter dari URL
+        $subkategori = $this->input->get('subkategori', TRUE);
+        $tahun       = $this->input->get('tahun', TRUE);
+        $jenis       = $this->input->get('jenis', TRUE); // Jenis = kategori utama (contoh: Bangunan Gedung)
 
-        $data['title'] = 'Dashboard';
-        $data['page'] = 'dashboard/index';
+        $data['title']   = 'Dashboard';
+        $data['page']    = 'dashboard/index';
         $data['summary'] = $this->Dashboard_model->get_summary();
 
-        // Ambil data berdasarkan filter (jika ada)
-        if ($subkategori || $tahun) {
+        // Filter logika
+        if (!empty($jenis)) {
+            $data['files'] = $this->Dashboard_model->get_filtered_by_jenis($jenis, $subkategori, $tahun);
+        } elseif (!empty($subkategori) || !empty($tahun)) {
             $data['files'] = $this->Dashboard_model->get_filtered($subkategori, $tahun);
         } else {
             $data['files'] = $this->Dashboard_model->get_all();
@@ -26,9 +31,11 @@ class Dashboard extends CI_Controller {
         $this->load->view('layouts/template', $data);
     }
 
-    // Fungsi JSON jika diperlukan (opsional)
-    public function filter($subkategori = '', $tahun = '') {
-        $filtered = $this->Dashboard_model->filter_jasa_konstruksi_by_tahun($tahun);
-        echo json_encode($filtered);
+    // Endpoint JSON (opsional AJAX)
+    public function filter($subkategori = '', $tahun = '', $jenis = '') {
+        $result = $this->Dashboard_model->get_filtered_by_jenis($jenis, $subkategori, $tahun);
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($result));
     }
 }

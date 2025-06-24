@@ -10,14 +10,14 @@ class File extends CI_Controller {
         $this->load->model('Dashboard_model');
     }
 
-    // Menampilkan halaman upload
+    // Menampilkan halaman form upload
     public function upload() {
         $data['title'] = 'Upload File';
         $data['page']  = 'file/upload';
         $this->load->view('layouts/template', $data);
     }
 
-    // Proses upload file
+    // Proses simpan file
     public function do_upload() {
         $upload_path = FCPATH . 'uploads/';
 
@@ -27,7 +27,7 @@ class File extends CI_Controller {
 
         $config['upload_path']   = $upload_path;
         $config['allowed_types'] = 'pdf|doc|docx|xls|xlsx|jpg|jpeg|png|zip|rar';
-        $config['max_size']      = 2048; // max 2 MB
+        $config['max_size']      = 2048; // 2MB
         $config['file_name']     = time() . '_' . preg_replace("/[^a-zA-Z0-9\.]/", "_", $_FILES['file']['name']);
 
         $this->upload->initialize($config);
@@ -42,21 +42,26 @@ class File extends CI_Controller {
         // Ambil data dari form
         $jenis_paket      = $this->input->post('jenis_paket');
         $subkategori      = $this->input->post('subkategori');
+        $tahun_konstruksi = $this->input->post('tahun_konstruksi');
 
-        // Untuk Jasa Konstruksi, subkategori diabaikan (di-set null)
-        if ($jenis_paket === 'Jasa Konstruksi') {
+        // Validasi kategori yang butuh subkategori
+        $kategori_bersub = ['Air Limbah', 'Air Bersih', 'Bangunan Gedung'];
+        if (!in_array($jenis_paket, $kategori_bersub)) {
             $subkategori = null;
         }
 
-        // Tahun konstruksi diambil dari input, harus ada jika jenis paket Jasa Konstruksi atau Air Limbah & subkategori dipilih
-        $tahun_konstruksi = $this->input->post('tahun_konstruksi') ?: null;
+        // Validasi kategori yang butuh tahun
+        $kategori_bertahun = ['Air Limbah', 'Air Bersih', 'Jasa Konstruksi', 'Bangunan Gedung', 'Drainase'];
+        if (!in_array($jenis_paket, $kategori_bertahun)) {
+            $tahun_konstruksi = null;
+        }
 
         $data = [
             'jenis_paket'      => $jenis_paket,
             'subkategori'      => $subkategori,
-            'tahun_konstruksi' => $tahun_konstruksi,
+            'tahun_konstruksi' => $tahun_konstruksi ?: null,
             'nama_paket'       => $this->input->post('nama_paket'),
-            'tahun'            => null, // field tahun umum diabaikan jika tidak dipakai
+            'tahun'            => null, // legacy, tidak digunakan
             'sumber_dana'      => $this->input->post('sumber_dana'),
             'nilai_paket'      => $this->input->post('nilai_paket'),
             'nilai_pagu'       => $this->input->post('nilai_pagu'),
@@ -77,7 +82,7 @@ class File extends CI_Controller {
         redirect('dashboard');
     }
 
-    // Menghapus file
+    // Menghapus file dan data
     public function delete($id) {
         $this->load->database();
         $this->db->where('id', $id);
@@ -99,7 +104,7 @@ class File extends CI_Controller {
         redirect('dashboard');
     }
 
-    // Opsional: Filter data berdasarkan subkategori dan tahun (bisa dikembangkan jika ingin AJAX)
+    // (Opsional) Filter via AJAX
     public function filter_data() {
         $subkategori = $this->input->get('subkategori');
         $tahun       = $this->input->get('tahun');

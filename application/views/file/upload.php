@@ -35,7 +35,7 @@
           <label><i class="fas fa-box mr-1"></i> Jenis Paket</label>
           <select name="jenis_paket" class="form-control" id="jenisPaket" required>
             <option value="">-- Pilih --</option>
-            <option value="Air Minum">Air Minum</option>
+            <option value="Air Bersih">Air Bersih</option>
             <option value="Air Limbah">Air Limbah</option>
             <option value="Bangunan Gedung">Bangunan Gedung</option>
             <option value="Jasa Konstruksi">Jasa Konstruksi</option>
@@ -44,6 +44,7 @@
           </select>
         </div>
 
+        <!-- Subkategori -->
         <div class="form-group" id="subkategoriGroup" style="display: none;">
           <label><i class="fas fa-tags mr-1"></i> Subkategori</label>
           <select name="subkategori" class="form-control" id="subkategoriSelect">
@@ -51,9 +52,21 @@
           </select>
         </div>
 
+        <!-- Tahun Konstruksi -->
         <div class="form-group" id="tahunGroup" style="display: none;">
           <label><i class="fas fa-calendar-alt mr-1"></i> Tahun Konstruksi</label>
-          <select name="tahun_konstruksi" class="form-control" required>
+          <select name="tahun_konstruksi" class="form-control">
+            <option value="">-- Pilih Tahun --</option>
+            <?php for ($i = 2015; $i <= 2025; $i++): ?>
+              <option value="<?= $i ?>"><?= $i ?></option>
+            <?php endfor; ?>
+          </select>
+        </div>
+
+        <!-- Tahun Umum untuk Drainase -->
+        <div class="form-group" id="tahunDrainaseGroup" style="display: none;">
+          <label><i class="fas fa-calendar mr-1"></i> Tahun</label>
+          <select name="tahun" class="form-control">
             <option value="">-- Pilih Tahun --</option>
             <?php for ($i = 2015; $i <= 2025; $i++): ?>
               <option value="<?= $i ?>"><?= $i ?></option>
@@ -108,7 +121,7 @@
 <script>
   const subkategoriMap = {
     'Air Limbah': ['MCK', 'Tangki Septik'],
-    // 'Jasa Konstruksi': ['Gedung', 'Jalan', 'Jembatan']  // subkategori Jasa Konstruksi dihilangkan
+    'Air Bersih': ['Jaringan Perpipaan/SR', 'Sumur Warga']
   };
 
   $('#jenisPaket').on('change', function () {
@@ -116,21 +129,29 @@
     const subkategoriGroup = $('#subkategoriGroup');
     const subkategoriSelect = $('#subkategoriSelect');
     const tahunGroup = $('#tahunGroup');
+    const tahunDrainaseGroup = $('#tahunDrainaseGroup');
 
     subkategoriSelect.empty().append('<option value="">-- Pilih Subkategori --</option>');
 
-    if (val === 'Air Limbah') {
-      subkategoriGroup.show();
-      subkategoriMap['Air Limbah'].forEach(function (item) {
+    if (subkategoriMap[val]) {
+      subkategoriMap[val].forEach(function (item) {
         subkategoriSelect.append(`<option value="${item}">${item}</option>`);
       });
-      tahunGroup.hide();  // sembunyikan dulu, akan muncul jika subkategori dipilih
+      subkategoriGroup.show();
+      tahunGroup.hide();
+      tahunDrainaseGroup.hide();
     } else if (val === 'Jasa Konstruksi') {
       subkategoriGroup.hide();
-      tahunGroup.show();  // langsung tampilkan tahun konstruksi
+      tahunGroup.show();
+      tahunDrainaseGroup.hide();
+    } else if (val === 'Drainase') {
+      subkategoriGroup.hide();
+      tahunGroup.hide();
+      tahunDrainaseGroup.show();
     } else {
       subkategoriGroup.hide();
       tahunGroup.hide();
+      tahunDrainaseGroup.hide();
     }
   });
 

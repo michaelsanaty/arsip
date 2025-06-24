@@ -78,7 +78,7 @@
     <div class="row">
       <?php
         $categories = [
-          ['key' => 'air_mineral', 'label' => 'Air Minum', 'color' => 'info', 'icon' => 'glass-whiskey'],
+          ['key' => 'air_bersih', 'label' => 'Air Bersih', 'color' => 'info', 'icon' => 'tint'],
           ['key' => 'air_limbah', 'label' => 'Air Limbah', 'color' => 'success', 'icon' => 'recycle'],
           ['key' => 'bangunan', 'label' => 'Bangunan Gedung', 'color' => 'warning', 'icon' => 'city'],
           ['key' => 'jasa_konstruksi', 'label' => 'Jasa Konstruksi', 'color' => 'danger', 'icon' => 'hard-hat'],
@@ -106,9 +106,27 @@
             </div>
           <?php elseif ($c['label'] === 'Jasa Konstruksi'): ?>
             <div class="wrapper-container mt-3 text-center">
-              <!-- Tombol tahun saja tanpa subkategori -->
               <button class="btn btn-light rounded-pill px-4 py-2 mx-2 btn-tahun" data-target="tahun-jasa-konstruksi">Filter Tahun</button>
               <div id="tahun-jasa-konstruksi" class="tahun-wrapper"></div>
+            </div>
+          <?php elseif ($c['label'] === 'Air Bersih'): ?>
+            <div class="wrapper-container mt-3 text-center">
+              <button class="btn btn-light rounded-pill px-4 py-2 mx-2 btn-subkategori" data-target="tahun-air-sr">Jaringan Perpipaan/SR</button>
+              <button class="btn btn-light rounded-pill px-4 py-2 mx-2 btn-subkategori" data-target="tahun-air-sumur">Sumur Warga</button>
+              <div id="tahun-air-sr" class="tahun-wrapper"></div>
+              <div id="tahun-air-sumur" class="tahun-wrapper"></div>
+            </div>
+          <?php elseif ($c['label'] === 'Drainase'): ?>
+            <div class="wrapper-container mt-3 text-center">
+              <button class="btn btn-light rounded-pill px-4 py-2 mx-2 btn-tahun" data-target="tahun-drainase">Filter Tahun</button>
+              <div id="tahun-drainase" class="tahun-wrapper"></div>
+            </div>
+          <?php elseif ($c['label'] === 'Bangunan Gedung'): ?>
+            <div class="wrapper-container mt-3 text-center">
+              <button class="btn btn-light rounded-pill px-4 py-2 mx-2 btn-subkategori" data-target="tahun-gedung-sekolah">Gedung Sekolah</button>
+              <button class="btn btn-light rounded-pill px-4 py-2 mx-2 btn-subkategori" data-target="tahun-gedung-kesehatan">Gedung Kesehatan</button>
+              <div id="tahun-gedung-sekolah" class="tahun-wrapper"></div>
+              <div id="tahun-gedung-kesehatan" class="tahun-wrapper"></div>
             </div>
           <?php endif; ?>
         </div>
@@ -171,19 +189,22 @@
   const tahunWrappers = {
     'tahun-limbah-septik': 'Tangki Septik',
     'tahun-limbah-mck': 'MCK',
-    'tahun-jasa-konstruksi': '' // kosong karena tanpa subkategori
+    'tahun-jasa-konstruksi': '',
+    'tahun-air-sr': 'Jaringan Perpipaan/SR',
+    'tahun-air-sumur': 'Sumur Warga',
+    'tahun-drainase': '',
+    'tahun-gedung-sekolah': 'Gedung Sekolah',
+    'tahun-gedung-kesehatan': 'Gedung Kesehatan'
   };
 
   const hideTimers = {};
 
-  // Handler untuk tombol subkategori (Air Limbah) dan tombol tahun (Jasa Konstruksi)
   document.querySelectorAll('.btn-subkategori, .btn-tahun').forEach(btn => {
     btn.addEventListener('click', function () {
       const targetId = this.dataset.target;
 
       Object.keys(tahunWrappers).forEach(id => {
-        const wrapper = document.getElementById(id);
-        wrapper.classList.remove('show');
+        document.getElementById(id).classList.remove('show');
       });
 
       const targetEl = document.getElementById(targetId);
@@ -196,7 +217,7 @@
         const tahunHtml = Array.from({ length: 11 }, (_, i) => 2015 + i).map(y => {
           let url = `<?= base_url('dashboard') ?>?tahun=${y}`;
           if (subkategori) url += `&subkategori=${encodeURIComponent(subkategori)}`;
-          return `<a href="${url}" class="tahun-badge" data-sub="${subkategori}" data-year="${y}">${y}</a>`;
+          return `<a href="${url}" class="tahun-badge">${y}</a>`;
         }).join('');
         targetEl.innerHTML = tahunHtml;
       }
