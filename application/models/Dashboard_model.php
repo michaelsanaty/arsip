@@ -9,7 +9,6 @@ class Dashboard_model extends CI_Model {
     public function get_summary() {
         $summary = [];
 
-        // Mapping nama kategori dengan key dashboard
         $kategori = [
             'Air Bersih'       => 'air_bersih',
             'Air Limbah'       => 'air_limbah',
@@ -22,34 +21,32 @@ class Dashboard_model extends CI_Model {
         foreach ($kategori as $jenis => $key) {
             $this->db->where('jenis_paket', $jenis);
             $summary[$key] = $this->db->count_all_results('file_uploads');
-            $this->db->reset_query();
+            $this->db->reset_query(); // Reset agar tidak terbawa ke iterasi selanjutnya
         }
 
         return $summary;
     }
 
     /**
-     * Ambil semua data file (jika jenis_paket diberikan, hanya untuk kategori tersebut)
+     * Ambil semua data file (bisa dengan filter jenis_paket jika diisi)
      */
     public function get_all($jenis_paket = null) {
         if (!empty($jenis_paket)) {
             $this->db->where('jenis_paket', $jenis_paket);
         }
-
         $this->db->order_by('id', 'DESC');
         return $this->db->get('file_uploads')->result();
     }
 
     /**
-     * Simpan data file ke database
+     * Insert data file baru
      */
     public function insert_file($data) {
         return $this->db->insert('file_uploads', $data);
     }
 
     /**
-     * Filter umum berdasarkan subkategori dan tahun_konstruksi
-     * Digunakan jika tidak menyertakan parameter `jenis_paket`
+     * Filter berdasarkan subkategori dan tahun (digunakan jika jenis tidak diisi)
      */
     public function get_filtered($subkategori = '', $tahun = '') {
         $this->db->from('file_uploads');
@@ -70,8 +67,7 @@ class Dashboard_model extends CI_Model {
     }
 
     /**
-     * Filter lengkap berdasarkan jenis_paket, subkategori, dan tahun
-     * Digunakan oleh controller untuk semua kategori
+     * Filter utama berdasarkan jenis_paket, subkategori (opsional), dan tahun (opsional)
      */
     public function get_filtered_by_jenis($jenis, $subkategori = '', $tahun = '') {
         $this->db->from('file_uploads');
@@ -90,16 +86,5 @@ class Dashboard_model extends CI_Model {
 
         $this->db->order_by('id', 'DESC');
         return $this->db->get()->result();
-    }
-
-    /**
-     * (Opsional) Filter khusus kategori tertentu – bisa digunakan jika ingin split model
-     */
-    public function filter_by_subkategori_and_tahun($subkategori, $tahun) {
-        return $this->get_filtered_by_jenis('Air Limbah', $subkategori, $tahun);
-    }
-
-    public function filter_jasa_konstruksi_by_tahun($tahun) {
-        return $this->get_filtered_by_jenis('Jasa Konstruksi', '', $tahun);
     }
 }

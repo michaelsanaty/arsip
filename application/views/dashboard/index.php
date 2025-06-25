@@ -19,10 +19,7 @@
   .custom-box.bg-secondary { background: linear-gradient(135deg, #6c757d, #5a6268); }
   .custom-box.bg-primary { background: linear-gradient(135deg, #007bff, #0056b3); }
 
-  .wrapper-container {
-    position: relative;
-  }
-
+  .wrapper-container { position: relative; }
   .tahun-wrapper {
     position: absolute;
     top: -170%;
@@ -41,13 +38,11 @@
     z-index: 9999;
     min-width: 250px;
   }
-
   .tahun-wrapper.show {
     opacity: 1;
     transform: translateX(-50%) scale(1);
     pointer-events: auto;
   }
-
   .tahun-badge {
     font-size: 0.8rem;
     padding: 4px 10px;
@@ -62,9 +57,7 @@
     display: inline-block;
     text-decoration: none;
   }
-
-  .tahun-badge:hover,
-  .tahun-badge.active {
+  .tahun-badge:hover, .tahun-badge.active {
     background-color: #28a745;
     color: #fff;
     transform: scale(1.05);
@@ -128,13 +121,21 @@
               <div id="tahun-gedung-sekolah" class="tahun-wrapper"></div>
               <div id="tahun-gedung-kesehatan" class="tahun-wrapper"></div>
             </div>
+          <?php elseif ($c['label'] === 'Perizinan'): ?>
+            <div class="wrapper-container mt-3 text-center">
+              <button class="btn btn-light rounded-pill px-4 py-2 mx-2 btn-subkategori" data-target="tahun-pbg">PBG</button>
+              <button class="btn btn-light rounded-pill px-4 py-2 mx-2 btn-subkategori" data-target="tahun-slf">Sertifikat Layak Fungsi (SLF)</button>
+              <button class="btn btn-light rounded-pill px-4 py-2 mx-2 btn-subkategori" data-target="tahun-rekomtek">Rekomendasi Teknis</button>
+              <div id="tahun-pbg" class="tahun-wrapper"></div>
+              <div id="tahun-slf" class="tahun-wrapper"></div>
+              <div id="tahun-rekomtek" class="tahun-wrapper"></div>
+            </div>
           <?php endif; ?>
         </div>
       </div>
       <?php endforeach; ?>
     </div>
 
-    <!-- TABEL FILE -->
     <div class="card mt-4">
       <div class="card-header bg-dark text-white">
         <h5 class="mb-0 font-weight-bold"><i class="fas fa-folder-open mr-2"></i> Daftar File</h5>
@@ -187,14 +188,17 @@
 
 <script>
   const tahunWrappers = {
-    'tahun-limbah-septik': 'Tangki Septik',
-    'tahun-limbah-mck': 'MCK',
-    'tahun-jasa-konstruksi': '',
-    'tahun-air-sr': 'Jaringan Perpipaan/SR',
-    'tahun-air-sumur': 'Sumur Warga',
-    'tahun-drainase': '',
-    'tahun-gedung-sekolah': 'Gedung Sekolah',
-    'tahun-gedung-kesehatan': 'Gedung Kesehatan'
+    'tahun-limbah-septik': { jenis: 'Air Limbah', subkategori: 'Tangki Septik' },
+    'tahun-limbah-mck': { jenis: 'Air Limbah', subkategori: 'MCK' },
+    'tahun-jasa-konstruksi': { jenis: 'Jasa Konstruksi' },
+    'tahun-air-sr': { jenis: 'Air Bersih', subkategori: 'Jaringan Perpipaan/SR' },
+    'tahun-air-sumur': { jenis: 'Air Bersih', subkategori: 'Sumur Warga' },
+    'tahun-drainase': { jenis: 'Drainase' },
+    'tahun-gedung-sekolah': { jenis: 'Bangunan Gedung', subkategori: 'Gedung Sekolah' },
+    'tahun-gedung-kesehatan': { jenis: 'Bangunan Gedung', subkategori: 'Gedung Kesehatan' },
+    'tahun-pbg': { jenis: 'Perizinan', subkategori: 'PBG' },
+    'tahun-slf': { jenis: 'Perizinan', subkategori: 'Sertifikat Layak Fungsi (SLF)' },
+    'tahun-rekomtek': { jenis: 'Perizinan', subkategori: 'Rekomendasi Teknis' }
   };
 
   const hideTimers = {};
@@ -203,6 +207,7 @@
     btn.addEventListener('click', function () {
       const targetId = this.dataset.target;
 
+      // Sembunyikan semua dulu
       Object.keys(tahunWrappers).forEach(id => {
         document.getElementById(id).classList.remove('show');
       });
@@ -213,13 +218,20 @@
       }, 100);
 
       if (targetEl.innerHTML.trim() === '') {
-        const subkategori = tahunWrappers[targetId];
-        const tahunHtml = Array.from({ length: 11 }, (_, i) => 2015 + i).map(y => {
-          let url = `<?= base_url('dashboard') ?>?tahun=${y}`;
-          if (subkategori) url += `&subkategori=${encodeURIComponent(subkategori)}`;
-          return `<a href="${url}" class="tahun-badge">${y}</a>`;
-        }).join('');
-        targetEl.innerHTML = tahunHtml;
+        const data = tahunWrappers[targetId];
+
+        // Perizinan: tahun 2018–2025, lainnya 2015–2025
+        const startYear = (data.jenis === 'Perizinan') ? 2018 : 2015;
+        const endYear = 2025;
+
+        let html = '';
+        for (let y = startYear; y <= endYear; y++) {
+          let url = `<?= base_url('dashboard') ?>?tahun=${y}&jenis=${encodeURIComponent(data.jenis)}`;
+          if (data.subkategori) url += `&subkategori=${encodeURIComponent(data.subkategori)}`;
+          html += `<a href="${url}" class="tahun-badge">${y}</a>`;
+        }
+
+        targetEl.innerHTML = html;
       }
     });
   });

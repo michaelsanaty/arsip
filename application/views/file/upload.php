@@ -55,7 +55,7 @@
         <!-- Tahun Konstruksi -->
         <div class="form-group" id="tahunGroup" style="display: none;">
           <label><i class="fas fa-calendar-alt mr-1"></i> Tahun Konstruksi</label>
-          <select name="tahun_konstruksi" class="form-control">
+          <select name="tahun_konstruksi" class="form-control" id="tahunSelect">
             <option value="">-- Pilih Tahun --</option>
             <?php for ($i = 2015; $i <= 2025; $i++): ?>
               <option value="<?= $i ?>"><?= $i ?></option>
@@ -63,16 +63,19 @@
           </select>
         </div>
 
-        <!-- Tahun Umum untuk Drainase -->
+        <!-- Tahun Umum untuk Drainase & Perizinan -->
         <div class="form-group" id="tahunDrainaseGroup" style="display: none;">
           <label><i class="fas fa-calendar mr-1"></i> Tahun</label>
-          <select name="tahun" class="form-control">
+          <select name="tahun_konstruksi" class="form-control" id="tahunSelectAlt">
             <option value="">-- Pilih Tahun --</option>
-            <?php for ($i = 2015; $i <= 2025; $i++): ?>
+            <?php for ($i = 2018; $i <= 2025; $i++): ?>
               <option value="<?= $i ?>"><?= $i ?></option>
             <?php endfor; ?>
           </select>
         </div>
+
+        <!-- Hidden input untuk menyimpan tahun final -->
+        <input type="hidden" name="tahun" id="hiddenTahun">
 
         <div class="form-group">
           <label><i class="fas fa-pen-nib mr-1"></i> Nama Paket</label>
@@ -121,7 +124,8 @@
 <script>
   const subkategoriMap = {
     'Air Limbah': ['MCK', 'Tangki Septik'],
-    'Air Bersih': ['Jaringan Perpipaan/SR', 'Sumur Warga']
+    'Air Bersih': ['Jaringan Perpipaan/SR', 'Sumur Warga'],
+    'Perizinan': ['PBG', 'Sertifikat Layak Fungsi (SLF)', 'Rekomendasi Teknis']
   };
 
   $('#jenisPaket').on('change', function () {
@@ -144,7 +148,7 @@
       subkategoriGroup.hide();
       tahunGroup.show();
       tahunDrainaseGroup.hide();
-    } else if (val === 'Drainase') {
+    } else if (val === 'Drainase' || val === 'Perizinan' || val === 'Bangunan Gedung') {
       subkategoriGroup.hide();
       tahunGroup.hide();
       tahunDrainaseGroup.show();
@@ -153,6 +157,12 @@
       tahunGroup.hide();
       tahunDrainaseGroup.hide();
     }
+
+    $('#hiddenTahun').val('');
+  });
+
+  $('#tahunSelect, #tahunSelectAlt').on('change', function () {
+    $('#hiddenTahun').val($(this).val());
   });
 
   $('#subkategoriSelect').on('change', function () {

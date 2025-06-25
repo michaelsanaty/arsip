@@ -10,24 +10,25 @@ class File extends CI_Controller {
         $this->load->model('Dashboard_model');
     }
 
-    // Menampilkan halaman form upload
+    // Halaman form upload
     public function upload() {
         $data['title'] = 'Upload File';
         $data['page']  = 'file/upload';
         $this->load->view('layouts/template', $data);
     }
 
-    // Proses simpan file
+    // Proses upload file
     public function do_upload() {
         $upload_path = FCPATH . 'uploads/';
 
+        // Buat folder uploads jika belum ada
         if (!is_dir($upload_path)) {
             mkdir($upload_path, 0755, true);
         }
 
         $config['upload_path']   = $upload_path;
         $config['allowed_types'] = 'pdf|doc|docx|xls|xlsx|jpg|jpeg|png|zip|rar';
-        $config['max_size']      = 2048; // 2MB
+        $config['max_size']      = 2048;
         $config['file_name']     = time() . '_' . preg_replace("/[^a-zA-Z0-9\.]/", "_", $_FILES['file']['name']);
 
         $this->upload->initialize($config);
@@ -39,29 +40,34 @@ class File extends CI_Controller {
 
         $file = $this->upload->data();
 
-        // Ambil data dari form
+        // Ambil inputan
         $jenis_paket      = $this->input->post('jenis_paket');
         $subkategori      = $this->input->post('subkategori');
-        $tahun_konstruksi = $this->input->post('tahun_konstruksi');
+        $tahun_hidden     = $this->input->post('tahun');             // dari input hidden JS
+        $tahun_dropdown   = $this->input->post('tahun_konstruksi'); // dari select biasa
 
-        // Validasi kategori yang butuh subkategori
-        $kategori_bersub = ['Air Limbah', 'Air Bersih', 'Bangunan Gedung'];
-        if (!in_array($jenis_paket, $kategori_bersub)) {
+        // Tentukan tahun final
+        $tahun_final = !empty($tahun_hidden) ? $tahun_hidden : $tahun_dropdown;
+
+        // Jika jenis paket tidak pakai subkategori
+        $kategori_tanpa_sub = ['Jasa Konstruksi', 'Drainase'];
+        if (in_array($jenis_paket, $kategori_tanpa_sub)) {
             $subkategori = null;
         }
 
-        // Validasi kategori yang butuh tahun
-        $kategori_bertahun = ['Air Limbah', 'Air Bersih', 'Jasa Konstruksi', 'Bangunan Gedung', 'Drainase'];
-        if (!in_array($jenis_paket, $kategori_bertahun)) {
-            $tahun_konstruksi = null;
+        // Validasi jika tahun kosong
+        if (empty($tahun_final)) {
+            $this->session->set_flashdata('error', '❌ Tahun belum dipilih.');
+            redirect('file/upload');
         }
 
+        // Simpan ke database
         $data = [
             'jenis_paket'      => $jenis_paket,
             'subkategori'      => $subkategori,
-            'tahun_konstruksi' => $tahun_konstruksi ?: null,
+            'tahun'            => $tahun_final,
+            'tahun_konstruksi' => $tahun_final,
             'nama_paket'       => $this->input->post('nama_paket'),
-            'tahun'            => null, // legacy, tidak digunakan
             'sumber_dana'      => $this->input->post('sumber_dana'),
             'nilai_paket'      => $this->input->post('nilai_paket'),
             'nilai_pagu'       => $this->input->post('nilai_pagu'),
@@ -76,13 +82,13 @@ class File extends CI_Controller {
         if ($inserted) {
             $this->session->set_flashdata('success', '✅ File berhasil diunggah!');
         } else {
-            $this->session->set_flashdata('error', '❌ Gagal menyimpan data ke database.');
+            $this->session->set_flashdata('error', '❌ Gagal menyimpan ke database.');
         }
 
         redirect('dashboard');
     }
 
-    // Menghapus file dan data
+    // Hapus file dan data
     public function delete($id) {
         $this->load->database();
         $this->db->where('id', $id);
@@ -104,10 +110,11 @@ class File extends CI_Controller {
         redirect('dashboard');
     }
 
-    // (Opsional) Filter via AJAX
+    // Untuk filter via AJAX (opsional)
     public function filter_data() {
         $subkategori = $this->input->get('subkategori');
         $tahun       = $this->input->get('tahun');
+
         $data['result'] = $this->Dashboard_model->filter_by_subkategori_and_tahun($subkategori, $tahun);
         $this->load->view('file/tabel_filter', $data);
     }
