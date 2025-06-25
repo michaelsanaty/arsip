@@ -4,12 +4,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Dashboard_model extends CI_Model {
 
     /**
-     * Ringkasan jumlah file per jenis paket (untuk kotak dashboard)
+     * Ambil jumlah file per jenis_paket (untuk kotak dashboard ringkasan)
      */
     public function get_summary() {
         $summary = [];
 
-        // Mapping nama kategori dengan key dashboard
+        // Daftar kategori dan key tampilan kotak
         $kategori = [
             'Air Bersih'       => 'air_bersih',
             'Air Limbah'       => 'air_limbah',
@@ -29,7 +29,7 @@ class Dashboard_model extends CI_Model {
     }
 
     /**
-     * Ambil semua data file (jika jenis_paket diberikan, hanya untuk kategori tersebut)
+     * Ambil semua file, bisa difilter berdasarkan jenis_paket
      */
     public function get_all($jenis_paket = null) {
         if (!empty($jenis_paket)) {
@@ -41,14 +41,37 @@ class Dashboard_model extends CI_Model {
     }
 
     /**
-     * Simpan data file ke database
+     * Simpan data file baru
      */
     public function insert_file($data) {
         return $this->db->insert('file_uploads', $data);
     }
 
     /**
-     * Filter umum berdasarkan subkategori dan tahun
+     * Perbarui data file berdasarkan ID
+     */
+    public function update_file($id, $data) {
+        $this->db->where('id', $id);
+        return $this->db->update('file_uploads', $data);
+    }
+
+    /**
+     * Ambil satu data file berdasarkan ID
+     */
+    public function get_file_by_id($id) {
+        return $this->db->get_where('file_uploads', ['id' => $id])->row();
+    }
+
+    /**
+     * Hapus file berdasarkan ID
+     */
+    public function delete_file($id) {
+        $this->db->where('id', $id);
+        return $this->db->delete('file_uploads');
+    }
+
+    /**
+     * Filter umum berdasarkan subkategori dan/atau tahun
      */
     public function get_filtered($subkategori = '', $tahun = '') {
         $this->db->from('file_uploads');
@@ -69,8 +92,7 @@ class Dashboard_model extends CI_Model {
     }
 
     /**
-     * Filter lengkap berdasarkan jenis_paket, subkategori, dan tahun
-     * Filter tahun disesuaikan berdasarkan kategori
+     * Filter berdasarkan kategori utama, subkategori (opsional), dan tahun
      */
     public function get_filtered_by_jenis($jenis, $subkategori = '', $tahun = '') {
         $this->db->from('file_uploads');
@@ -81,16 +103,12 @@ class Dashboard_model extends CI_Model {
         }
 
         if (!empty($tahun)) {
+            // Khusus kategori tertentu pakai tahun_konstruksi
             switch ($jenis) {
                 case 'Jasa Konstruksi':
                 case 'Drainase':
                     $this->db->where('tahun_konstruksi', $tahun);
                     break;
-
-                case 'Air Bersih':
-                case 'Air Limbah':
-                case 'Bangunan Gedung':
-                case 'Perizinan':
                 default:
                     $this->db->where('tahun', $tahun);
                     break;
@@ -102,14 +120,14 @@ class Dashboard_model extends CI_Model {
     }
 
     /**
-     * Filter khusus kategori Air Limbah
+     * Filter default untuk kategori Air Limbah
      */
     public function filter_by_subkategori_and_tahun($subkategori, $tahun) {
         return $this->get_filtered_by_jenis('Air Limbah', $subkategori, $tahun);
     }
 
     /**
-     * Filter khusus Jasa Konstruksi berdasarkan tahun konstruksi
+     * Filter khusus Jasa Konstruksi hanya berdasarkan tahun_konstruksi
      */
     public function filter_jasa_konstruksi_by_tahun($tahun) {
         return $this->get_filtered_by_jenis('Jasa Konstruksi', '', $tahun);

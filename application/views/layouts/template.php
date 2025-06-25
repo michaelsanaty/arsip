@@ -1,3 +1,4 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,46 +11,30 @@
   <link rel="stylesheet" href="<?= base_url('aset/dist/css/adminlte.min.css') ?>" />
 
   <style>
-    /* Sidebar fixed full height */
+    body {
+      font-family: 'Segoe UI', sans-serif;
+    }
+
     .main-sidebar {
       position: fixed;
-      top: 57px; /* height navbar */
+      top: 0;
       bottom: 0;
       left: 0;
-      width: 250px;
-      overflow-y: auto;
-      z-index: 1030;
+      width: 200px; /* Lebar sidebar dikurangi */
+      background-color: #343a40;
+      overflow-x: hidden;
+      overflow-y: hidden;
       transition: width 0.3s ease;
     }
 
-    /* Content wrapper */
     .content-wrapper {
-      margin-left: 250px;
+      margin-left: 200px;
       padding: 1rem;
-      height: calc(100vh - 57px);
-      overflow-y: auto;
-      overflow-x: hidden;
+      min-height: 100vh;
       background: #f4f6f9;
       transition: margin-left 0.3s ease;
     }
 
-    /* Navbar fixed */
-    .main-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 57px;
-      z-index: 1040;
-      background: #fff;
-    }
-
-    /* Padding wrapper supaya konten tidak tertutup navbar */
-    .wrapper {
-      padding-top: 57px;
-    }
-
-    /* Sidebar collapse */
     body.sidebar-collapse .main-sidebar {
       width: 80px;
     }
@@ -58,74 +43,69 @@
       margin-left: 80px;
     }
 
-    /* Hide menu text on collapse */
     body.sidebar-collapse .nav-sidebar > .nav-item > .nav-link > p,
-    body.sidebar-collapse .nav-sidebar > .nav-item > .nav-link > span {
+    body.sidebar-collapse .brand-text {
       display: none;
     }
 
-    /* Center icon menu on collapse */
-    body.sidebar-collapse .nav-sidebar > .nav-item > .nav-link {
+    .brand-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #343a40;
+      padding: 0.75rem 1rem;
+      color: #fff;
+      font-weight: bold;
+      height: 60px;
+    }
+
+    .brand-text {
+      margin-left: 0.25rem;
+      font-size: 1rem;
+    }
+
+    .brand-toggle-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .sidebar {
+      padding-top: 0.5rem;
+    }
+
+    .nav-link i {
+      width: 20px;
       text-align: center;
+      margin-right: 10px;
     }
 
-    /* Enlarge icons on collapse */
-    body.sidebar-collapse .nav-sidebar > .nav-item > .nav-link > i {
-      font-size: 1.25rem;
-    }
-
-    /* Hide brand text on collapse */
-    body.sidebar-collapse .brand-link > span {
-      display: none;
+    .nav-sidebar .nav-item {
+      margin-bottom: 0.2rem;
     }
 
     body.sidebar-collapse .brand-link {
-      text-align: center;
+      justify-content: center;
     }
   </style>
 </head>
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
   <div class="wrapper">
 
-    <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <!-- Sidebar toggle button -->
-          <a class="nav-link" data-widget="pushmenu" href="#" role="button" aria-label="Toggle sidebar">
-            <i class="fas fa-bars"></i>
-          </a>
-        </li>
-      </ul>
-
-      <form class="form-inline ml-3">
-        <div class="input-group input-group-sm">
-          <input
-            class="form-control form-control-navbar"
-            type="search"
-            placeholder="Search"
-            aria-label="Search"
-          />
-          <div class="input-group-append">
-            <button class="btn btn-navbar" type="submit" aria-label="Search button">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-        </div>
-      </form>
-    </nav>
-
     <!-- Sidebar -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
-      <a href="#" class="brand-link">
-        <span class="brand-text font-weight-light">Manajemen File</span>
-      </a>
+    <aside class="main-sidebar elevation-4">
+      <div class="brand-link">
+        <span class="brand-text">Manajemen File</span>
+        <button class="brand-toggle-btn" id="toggleSidebar" title="Toggle Sidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+
       <div class="sidebar">
         <nav>
-          <ul
-            class="nav nav-pills nav-sidebar flex-column"
-            data-widget="treeview"
-          >
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview">
             <li class="nav-item">
               <a href="<?= base_url('dashboard') ?>" class="nav-link">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -149,10 +129,11 @@
       </div>
     </aside>
 
-    <!-- Main Content -->
-    <div class="content-wrapper p-4">
-      <?php $this->load->view($page); ?>
+    <!-- Konten Utama -->
+    <div class="content-wrapper">
+      <?php if (isset($page)) $this->load->view($page); ?>
     </div>
+
   </div>
 
   <!-- JS -->
@@ -161,9 +142,9 @@
   <script src="<?= base_url('aset/dist/js/adminlte.min.js') ?>"></script>
 
   <script>
-    // Initialize pushmenu manually (optional, AdminLTE should auto-init)
-    $(function () {
-      $('[data-widget="pushmenu"]').PushMenu();
+    document.getElementById('toggleSidebar').addEventListener('click', function (e) {
+      e.preventDefault();
+      document.body.classList.toggle('sidebar-collapse');
     });
   </script>
 </body>

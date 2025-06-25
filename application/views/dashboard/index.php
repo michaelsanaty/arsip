@@ -154,6 +154,7 @@
               <th>Tanggal Upload</th>
               <th>Volume</th>
               <th>File</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -175,9 +176,13 @@
                     <span class="text-muted">-</span>
                   <?php endif; ?>
                 </td>
+                <td class="text-center">
+                  <a href="<?= site_url('file/edit/' . $file->id) ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+                  <a href="<?= site_url('file/delete/' . $file->id) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus file ini?')"><i class="fas fa-trash"></i></a>
+                </td>
               </tr>
             <?php endforeach; else: ?>
-              <tr><td colspan="10" class="text-center">Belum ada data.</td></tr>
+              <tr><td colspan="11" class="text-center">Belum ada data.</td></tr>
             <?php endif; ?>
           </tbody>
         </table>
@@ -207,7 +212,6 @@
     btn.addEventListener('click', function () {
       const targetId = this.dataset.target;
 
-      // Sembunyikan semua dulu
       Object.keys(tahunWrappers).forEach(id => {
         document.getElementById(id).classList.remove('show');
       });
@@ -219,8 +223,6 @@
 
       if (targetEl.innerHTML.trim() === '') {
         const data = tahunWrappers[targetId];
-
-        // Perizinan: tahun 2018–2025, lainnya 2015–2025
         const startYear = (data.jenis === 'Perizinan') ? 2018 : 2015;
         const endYear = 2025;
 

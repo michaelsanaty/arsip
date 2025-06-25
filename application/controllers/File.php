@@ -10,17 +10,16 @@ class File extends CI_Controller {
         $this->load->model('Dashboard_model');
     }
 
-    // Tampilkan halaman upload
+    // TAMPIL HALAMAN UPLOAD
     public function upload() {
         $data['title'] = 'Upload File';
         $data['page']  = 'file/upload';
         $this->load->view('layouts/template', $data);
     }
 
-    // Proses simpan file
+    // PROSES UPLOAD
     public function do_upload() {
         $upload_path = FCPATH . 'uploads/';
-
         if (!is_dir($upload_path)) {
             mkdir($upload_path, 0755, true);
         }
@@ -29,34 +28,29 @@ class File extends CI_Controller {
         $config['allowed_types'] = 'pdf|doc|docx|xls|xlsx|jpg|jpeg|png|zip|rar';
         $config['max_size']      = 2048;
         $config['file_name']     = time() . '_' . preg_replace("/[^a-zA-Z0-9\.]/", "_", $_FILES['file']['name']);
-
         $this->upload->initialize($config);
 
         if (!$this->upload->do_upload('file')) {
             $this->session->set_flashdata('error', $this->upload->display_errors('', ''));
-            redirect('file/upload');
+            return redirect('file/upload');
         }
 
         $file = $this->upload->data();
-
-        // Ambil input dari form
         $jenis_paket = $this->input->post('jenis_paket');
         $subkategori = $this->input->post('subkategori');
-        $tahun       = $this->input->post('tahun'); // ✅ ini yang dipakai dari form
+        $tahun       = $this->input->post('tahun');
 
-        // Validasi: kategori tanpa subkategori
-        $kategori_tanpa_sub = ['Jasa Konstruksi', 'Drainase', 'Bangunan Gedung'];
+        // Kosongkan subkategori jika tidak relevan
+        $kategori_tanpa_sub = ['Jasa Konstruksi', 'Drainase'];
         if (in_array($jenis_paket, $kategori_tanpa_sub)) {
             $subkategori = null;
         }
 
-        // Validasi: pastikan tahun diisi untuk semua jenis kecuali tidak diperlukan
         if (empty($tahun)) {
             $this->session->set_flashdata('error', '❌ Tahun belum dipilih.');
             return redirect('file/upload');
         }
 
-        // Data yang akan disimpan
         $data = [
             'jenis_paket'      => $jenis_paket,
             'subkategori'      => $subkategori,
@@ -73,36 +67,95 @@ class File extends CI_Controller {
         ];
 
         $insert = $this->Dashboard_model->insert_file($data);
-
-        if ($insert) {
-            $this->session->set_flashdata('success', '✅ File berhasil diunggah!');
-        } else {
-            $this->session->set_flashdata('error', '❌ Gagal menyimpan ke database.');
-        }
-
+        $this->session->set_flashdata($insert ? 'success' : 'error', $insert ? '✅ File berhasil diunggah!' : '❌ Gagal menyimpan ke database.');
         redirect('dashboard');
     }
 
-    // Hapus file
-    public function delete($id) {
-        $this->load->database();
-        $this->db->where('id', $id);
-        $file = $this->db->get('file_uploads')->row();
+    // TAMPIL HALAMAN EDIT
+    public function edit($id) {
+        $file = $this->Dashboard_model->get_file_by_id($id);
+        if (!$file) {
+            show_404();
+        }
 
+        $data['title'] = 'Edit File';
+        $data['file']  = $file;
+        $data['page']  = 'file/edit';
+        $this->load->view('layouts/template', $data);
+    }
+
+    // PROSES UPDATE FILE
+    public function update($id) {
+        $file_lama = $this->Dashboard_model->get_file_by_id($id);
+        if (!$file_lama) {
+            show_404();
+        }
+
+        $jenis_paket = $this->input->post('jenis_paket');
+        $subkategori = $this->input->post('subkategori');
+
+        // Kosongkan subkategori jika tidak berlaku
+        $kategori_tanpa_sub = ['Jasa Konstruksi', 'Drainase'];
+        if (in_array($jenis_paket, $kategori_tanpa_sub)) {
+            $subkategori = null;
+        }
+
+        $data = [
+            'jenis_paket'      => $jenis_paket,
+            'subkategori'      => $subkategori,
+            'tahun_konstruksi' => $this->input->post('tahun'),
+            'tahun'            => $this->input->post('tahun'),
+            'nama_paket'       => $this->input->post('nama_paket'),
+            'sumber_dana'      => $this->input->post('sumber_dana'),
+            'nilai_paket'      => $this->input->post('nilai_paket'),
+            'nilai_pagu'       => $this->input->post('nilai_pagu'),
+            'tgl_upload'       => $this->input->post('tanggal'),
+            'volume'           => $this->input->post('volume'),
+        ];
+
+        if (!empty($_FILES['file']['name'])) {
+            $config['upload_path']   = FCPATH . 'uploads/';
+            $config['allowed_types'] = 'pdf|doc|docx|xls|xlsx|jpg|jpeg|png|zip|rar';
+            $config['max_size']      = 2048;
+            $config['file_name']     = time() . '_' . preg_replace("/[^a-zA-Z0-9\.]/", "_", $_FILES['file']['name']);
+            $this->upload->initialize($config);
+
+            if ($this->upload->do_upload('file')) {
+                $upload_data = $this->upload->data();
+                $data['file_upload'] = $upload_data['file_name'];
+
+                $old_path = FCPATH . 'uploads/' . $file_lama->file_upload;
+                if (file_exists($old_path)) {
+                    unlink($old_path);
+                }
+            } else {
+                $this->session->set_flashdata('error', $this->upload->display_errors('', ''));
+                return redirect('file/edit/' . $id);
+            }
+        }
+
+        $this->Dashboard_model->update_file($id, $data);
+        $this->session->set_flashdata('success', '✅ Data berhasil diperbarui.');
+        redirect('dashboard');
+    }
+
+    // HAPUS FILE
+    public function delete($id) {
+        $file = $this->Dashboard_model->get_file_by_id($id);
         if ($file) {
             $path = FCPATH . 'uploads/' . $file->file_upload;
-            if (file_exists($path)) unlink($path);
-
-            $this->db->delete('file_uploads', ['id' => $id]);
+            if (file_exists($path)) {
+                unlink($path);
+            }
+            $this->Dashboard_model->delete_file($id);
             $this->session->set_flashdata('success', '✅ File berhasil dihapus.');
         } else {
             $this->session->set_flashdata('error', '❌ File tidak ditemukan.');
         }
-
         redirect('dashboard');
     }
 
-    // Filter via AJAX
+    // AJAX FILTER (khusus air limbah)
     public function filter_data() {
         $subkategori = $this->input->get('subkategori');
         $tahun       = $this->input->get('tahun');

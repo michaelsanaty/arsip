@@ -1,3 +1,4 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,9 +53,9 @@
           </select>
         </div>
 
-        <!-- Tahun untuk Jasa Konstruksi -->
+        <!-- Tahun -->
         <div class="form-group" id="tahunGroup" style="display: none;">
-          <label><i class="fas fa-calendar-alt mr-1"></i> Tahun Konstruksi</label>
+          <label><i class="fas fa-calendar-alt mr-1"></i> Tahun</label>
           <select class="form-control tahunDropdown">
             <option value="">-- Pilih Tahun --</option>
             <?php for ($i = 2015; $i <= 2025; $i++): ?>
@@ -63,9 +64,8 @@
           </select>
         </div>
 
-        <!-- Tahun untuk Drainase -->
         <div class="form-group" id="tahunDrainaseGroup" style="display: none;">
-          <label><i class="fas fa-calendar mr-1"></i> Tahun</label>
+          <label><i class="fas fa-calendar-alt mr-1"></i> Tahun (Drainase)</label>
           <select class="form-control tahunDropdown">
             <option value="">-- Pilih Tahun --</option>
             <?php for ($i = 2015; $i <= 2025; $i++): ?>
@@ -74,9 +74,8 @@
           </select>
         </div>
 
-        <!-- Tahun untuk Perizinan -->
         <div class="form-group" id="tahunPerizinanGroup" style="display: none;">
-          <label><i class="fas fa-calendar-check mr-1"></i> Tahun</label>
+          <label><i class="fas fa-calendar-alt mr-1"></i> Tahun (Perizinan)</label>
           <select class="form-control tahunDropdown">
             <option value="">-- Pilih Tahun --</option>
             <?php for ($i = 2018; $i <= 2025; $i++): ?>
@@ -85,8 +84,8 @@
           </select>
         </div>
 
-        <!-- Hidden tahun yang disatukan -->
-        <input type="hidden" name="tahun" id="hiddenTahun">
+        <!-- Tahun tersimpan di sini -->
+        <input type="hidden" name="tahun" id="hiddenTahun" />
 
         <div class="form-group">
           <label><i class="fas fa-pen-nib mr-1"></i> Nama Paket</label>
@@ -136,33 +135,35 @@
   const subkategoriMap = {
     'Air Limbah': ['MCK', 'Tangki Septik'],
     'Air Bersih': ['Jaringan Perpipaan/SR', 'Sumur Warga'],
+    'Bangunan Gedung': ['Gedung Sekolah', 'Gedung Kesehatan'],
     'Perizinan': ['PBG', 'Sertifikat Layak Fungsi (SLF)', 'Rekomendasi Teknis']
   };
 
   $('#jenisPaket').on('change', function () {
     const val = $(this).val();
-    const subkategoriGroup = $('#subkategoriGroup');
-    const subkategoriSelect = $('#subkategoriSelect');
-    const tahunGroup = $('#tahunGroup');
-    const tahunDrainaseGroup = $('#tahunDrainaseGroup');
+    const subkategoriGroup    = $('#subkategoriGroup');
+    const subkategoriSelect   = $('#subkategoriSelect');
+    const tahunGroup          = $('#tahunGroup');
+    const tahunDrainaseGroup  = $('#tahunDrainaseGroup');
     const tahunPerizinanGroup = $('#tahunPerizinanGroup');
 
-    // Reset semua dulu
+    subkategoriSelect.empty().append('<option value="">-- Pilih Subkategori --</option>');
     subkategoriGroup.hide();
     tahunGroup.hide();
     tahunDrainaseGroup.hide();
     tahunPerizinanGroup.hide();
-    subkategoriSelect.empty().append('<option value="">-- Pilih Subkategori --</option>');
     $('#hiddenTahun').val('');
 
     if (subkategoriMap[val]) {
-      subkategoriMap[val].forEach(function (item) {
+      subkategoriMap[val].forEach(item => {
         subkategoriSelect.append(`<option value="${item}">${item}</option>`);
       });
       subkategoriGroup.show();
 
       if (val === 'Perizinan') {
         tahunPerizinanGroup.show();
+      } else {
+        tahunGroup.show();
       }
     } else if (val === 'Jasa Konstruksi') {
       tahunGroup.show();
@@ -171,18 +172,8 @@
     }
   });
 
-  // Ambil tahun dari dropdown manapun dan simpan ke input hidden
   $('.tahunDropdown').on('change', function () {
     $('#hiddenTahun').val($(this).val());
-  });
-
-  $('#subkategoriSelect').on('change', function () {
-    const val = $(this).val();
-    if (val && $('#jenisPaket').val() !== 'Perizinan') {
-      $('#tahunGroup').fadeIn();
-    } else if ($('#jenisPaket').val() !== 'Perizinan') {
-      $('#tahunGroup').fadeOut();
-    }
   });
 </script>
 </body>
