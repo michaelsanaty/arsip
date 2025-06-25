@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Upload File</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="<?= base_url('aset/plugins/fontawesome-free/css/all.min.css') ?>">
-  <link rel="stylesheet" href="<?= base_url('aset/dist/css/adminlte.min.css') ?>">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="<?= base_url('aset/plugins/fontawesome-free/css/all.min.css') ?>" />
+  <link rel="stylesheet" href="<?= base_url('aset/dist/css/adminlte.min.css') ?>" />
   <script src="<?= base_url('aset/plugins/jquery/jquery.min.js') ?>"></script>
 </head>
 <body>
@@ -52,10 +52,10 @@
           </select>
         </div>
 
-        <!-- Tahun Konstruksi -->
+        <!-- Tahun untuk Jasa Konstruksi -->
         <div class="form-group" id="tahunGroup" style="display: none;">
           <label><i class="fas fa-calendar-alt mr-1"></i> Tahun Konstruksi</label>
-          <select name="tahun_konstruksi" class="form-control" id="tahunSelect">
+          <select class="form-control tahunDropdown">
             <option value="">-- Pilih Tahun --</option>
             <?php for ($i = 2015; $i <= 2025; $i++): ?>
               <option value="<?= $i ?>"><?= $i ?></option>
@@ -63,10 +63,21 @@
           </select>
         </div>
 
-        <!-- Tahun Umum untuk Drainase & Perizinan -->
+        <!-- Tahun untuk Drainase -->
         <div class="form-group" id="tahunDrainaseGroup" style="display: none;">
           <label><i class="fas fa-calendar mr-1"></i> Tahun</label>
-          <select name="tahun_konstruksi" class="form-control" id="tahunSelectAlt">
+          <select class="form-control tahunDropdown">
+            <option value="">-- Pilih Tahun --</option>
+            <?php for ($i = 2015; $i <= 2025; $i++): ?>
+              <option value="<?= $i ?>"><?= $i ?></option>
+            <?php endfor; ?>
+          </select>
+        </div>
+
+        <!-- Tahun untuk Perizinan -->
+        <div class="form-group" id="tahunPerizinanGroup" style="display: none;">
+          <label><i class="fas fa-calendar-check mr-1"></i> Tahun</label>
+          <select class="form-control tahunDropdown">
             <option value="">-- Pilih Tahun --</option>
             <?php for ($i = 2018; $i <= 2025; $i++): ?>
               <option value="<?= $i ?>"><?= $i ?></option>
@@ -74,7 +85,7 @@
           </select>
         </div>
 
-        <!-- Hidden input untuk menyimpan tahun final -->
+        <!-- Hidden tahun yang disatukan -->
         <input type="hidden" name="tahun" id="hiddenTahun">
 
         <div class="form-group">
@@ -134,43 +145,43 @@
     const subkategoriSelect = $('#subkategoriSelect');
     const tahunGroup = $('#tahunGroup');
     const tahunDrainaseGroup = $('#tahunDrainaseGroup');
+    const tahunPerizinanGroup = $('#tahunPerizinanGroup');
 
+    // Reset semua dulu
+    subkategoriGroup.hide();
+    tahunGroup.hide();
+    tahunDrainaseGroup.hide();
+    tahunPerizinanGroup.hide();
     subkategoriSelect.empty().append('<option value="">-- Pilih Subkategori --</option>');
+    $('#hiddenTahun').val('');
 
     if (subkategoriMap[val]) {
       subkategoriMap[val].forEach(function (item) {
         subkategoriSelect.append(`<option value="${item}">${item}</option>`);
       });
       subkategoriGroup.show();
-      tahunGroup.hide();
-      tahunDrainaseGroup.hide();
-    } else if (val === 'Jasa Konstruksi') {
-      subkategoriGroup.hide();
-      tahunGroup.show();
-      tahunDrainaseGroup.hide();
-    } else if (val === 'Drainase' || val === 'Perizinan' || val === 'Bangunan Gedung') {
-      subkategoriGroup.hide();
-      tahunGroup.hide();
-      tahunDrainaseGroup.show();
-    } else {
-      subkategoriGroup.hide();
-      tahunGroup.hide();
-      tahunDrainaseGroup.hide();
-    }
 
-    $('#hiddenTahun').val('');
+      if (val === 'Perizinan') {
+        tahunPerizinanGroup.show();
+      }
+    } else if (val === 'Jasa Konstruksi') {
+      tahunGroup.show();
+    } else if (val === 'Drainase') {
+      tahunDrainaseGroup.show();
+    }
   });
 
-  $('#tahunSelect, #tahunSelectAlt').on('change', function () {
+  // Ambil tahun dari dropdown manapun dan simpan ke input hidden
+  $('.tahunDropdown').on('change', function () {
     $('#hiddenTahun').val($(this).val());
   });
 
   $('#subkategoriSelect').on('change', function () {
     const val = $(this).val();
-    if (val) {
-      $('#tahunGroup').fadeIn(200);
-    } else {
-      $('#tahunGroup').fadeOut(200);
+    if (val && $('#jenisPaket').val() !== 'Perizinan') {
+      $('#tahunGroup').fadeIn();
+    } else if ($('#jenisPaket').val() !== 'Perizinan') {
+      $('#tahunGroup').fadeOut();
     }
   });
 </script>

@@ -10,18 +10,17 @@ class File extends CI_Controller {
         $this->load->model('Dashboard_model');
     }
 
-    // Halaman form upload
+    // Tampilkan halaman upload
     public function upload() {
         $data['title'] = 'Upload File';
         $data['page']  = 'file/upload';
         $this->load->view('layouts/template', $data);
     }
 
-    // Proses upload file
+    // Proses simpan file
     public function do_upload() {
         $upload_path = FCPATH . 'uploads/';
 
-        // Buat folder uploads jika belum ada
         if (!is_dir($upload_path)) {
             mkdir($upload_path, 0755, true);
         }
@@ -40,33 +39,29 @@ class File extends CI_Controller {
 
         $file = $this->upload->data();
 
-        // Ambil inputan
-        $jenis_paket      = $this->input->post('jenis_paket');
-        $subkategori      = $this->input->post('subkategori');
-        $tahun_hidden     = $this->input->post('tahun');             // dari input hidden JS
-        $tahun_dropdown   = $this->input->post('tahun_konstruksi'); // dari select biasa
+        // Ambil input dari form
+        $jenis_paket = $this->input->post('jenis_paket');
+        $subkategori = $this->input->post('subkategori');
+        $tahun       = $this->input->post('tahun'); // ✅ ini yang dipakai dari form
 
-        // Tentukan tahun final
-        $tahun_final = !empty($tahun_hidden) ? $tahun_hidden : $tahun_dropdown;
-
-        // Jika jenis paket tidak pakai subkategori
-        $kategori_tanpa_sub = ['Jasa Konstruksi', 'Drainase'];
+        // Validasi: kategori tanpa subkategori
+        $kategori_tanpa_sub = ['Jasa Konstruksi', 'Drainase', 'Bangunan Gedung'];
         if (in_array($jenis_paket, $kategori_tanpa_sub)) {
             $subkategori = null;
         }
 
-        // Validasi jika tahun kosong
-        if (empty($tahun_final)) {
+        // Validasi: pastikan tahun diisi untuk semua jenis kecuali tidak diperlukan
+        if (empty($tahun)) {
             $this->session->set_flashdata('error', '❌ Tahun belum dipilih.');
-            redirect('file/upload');
+            return redirect('file/upload');
         }
 
-        // Simpan ke database
+        // Data yang akan disimpan
         $data = [
             'jenis_paket'      => $jenis_paket,
             'subkategori'      => $subkategori,
-            'tahun'            => $tahun_final,
-            'tahun_konstruksi' => $tahun_final,
+            'tahun_konstruksi' => $tahun,
+            'tahun'            => $tahun,
             'nama_paket'       => $this->input->post('nama_paket'),
             'sumber_dana'      => $this->input->post('sumber_dana'),
             'nilai_paket'      => $this->input->post('nilai_paket'),
@@ -77,9 +72,9 @@ class File extends CI_Controller {
             'created_at'       => date('Y-m-d H:i:s'),
         ];
 
-        $inserted = $this->Dashboard_model->insert_file($data);
+        $insert = $this->Dashboard_model->insert_file($data);
 
-        if ($inserted) {
+        if ($insert) {
             $this->session->set_flashdata('success', '✅ File berhasil diunggah!');
         } else {
             $this->session->set_flashdata('error', '❌ Gagal menyimpan ke database.');
@@ -88,20 +83,17 @@ class File extends CI_Controller {
         redirect('dashboard');
     }
 
-    // Hapus file dan data
+    // Hapus file
     public function delete($id) {
         $this->load->database();
         $this->db->where('id', $id);
         $file = $this->db->get('file_uploads')->row();
 
         if ($file) {
-            $file_path = FCPATH . 'uploads/' . $file->file_upload;
-            if (file_exists($file_path)) {
-                unlink($file_path);
-            }
+            $path = FCPATH . 'uploads/' . $file->file_upload;
+            if (file_exists($path)) unlink($path);
 
-            $this->db->where('id', $id);
-            $this->db->delete('file_uploads');
+            $this->db->delete('file_uploads', ['id' => $id]);
             $this->session->set_flashdata('success', '✅ File berhasil dihapus.');
         } else {
             $this->session->set_flashdata('error', '❌ File tidak ditemukan.');
@@ -110,7 +102,7 @@ class File extends CI_Controller {
         redirect('dashboard');
     }
 
-    // Untuk filter via AJAX (opsional)
+    // Filter via AJAX
     public function filter_data() {
         $subkategori = $this->input->get('subkategori');
         $tahun       = $this->input->get('tahun');

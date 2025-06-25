@@ -10,16 +10,16 @@ class Dashboard extends CI_Controller {
     }
 
     public function index() {
-        // Ambil parameter dari URL (GET)
-        $jenis       = $this->input->get('jenis', TRUE);        // Jenis Paket
-        $subkategori = $this->input->get('subkategori', TRUE);  // Subkategori
-        $tahun       = $this->input->get('tahun', TRUE);        // Tahun Konstruksi
+        // Ambil filter dari URL
+        $subkategori = $this->input->get('subkategori', TRUE);
+        $tahun       = $this->input->get('tahun', TRUE);
+        $jenis       = $this->input->get('jenis', TRUE); // Jenis = kategori utama (contoh: Bangunan Gedung)
 
         $data['title']   = 'Dashboard';
         $data['page']    = 'dashboard/index';
         $data['summary'] = $this->Dashboard_model->get_summary();
 
-        // Logika prioritas filter
+        // Filter logika
         if (!empty($jenis)) {
             $data['files'] = $this->Dashboard_model->get_filtered_by_jenis($jenis, $subkategori, $tahun);
         } elseif (!empty($subkategori) || !empty($tahun)) {
@@ -28,11 +28,10 @@ class Dashboard extends CI_Controller {
             $data['files'] = $this->Dashboard_model->get_all();
         }
 
-        // Tampilkan ke template utama
         $this->load->view('layouts/template', $data);
     }
 
-    // Opsional: Endpoint JSON (bisa digunakan untuk AJAX filter dinamis)
+    // Endpoint JSON (opsional AJAX)
     public function filter($subkategori = '', $tahun = '', $jenis = '') {
         $result = $this->Dashboard_model->get_filtered_by_jenis($jenis, $subkategori, $tahun);
         $this->output
