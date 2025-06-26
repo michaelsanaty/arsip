@@ -20,7 +20,7 @@
       top: 0;
       bottom: 0;
       left: 0;
-      width: 200px; /* Lebar sidebar dikurangi */
+      width: 200px;
       background-color: #343a40;
       overflow-x: hidden;
       overflow-y: hidden;
@@ -122,6 +122,14 @@
               <a href="<?= base_url('file/search') ?>" class="nav-link">
                 <i class="nav-icon fas fa-search"></i>
                 <p>File Search</p>
+              </a>
+            </li>
+
+            <!-- 🔴 Tombol Logout -->
+            <li class="nav-item">
+              <a href="<?= base_url('auth/logout') ?>" class="nav-link text-danger">
+                <i class="nav-icon fas fa-sign-out-alt"></i>
+                <p>Logout</p>
               </a>
             </li>
           </ul>

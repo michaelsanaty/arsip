@@ -5,19 +5,25 @@ class File extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
+
+        // 🔒 Proteksi login agar semua method hanya bisa diakses jika sudah login
+        if (!$this->session->userdata('logged_in')) {
+            redirect('auth');
+        }
+
         $this->load->library(['session', 'upload']);
         $this->load->helper(['url', 'form', 'file']);
         $this->load->model('Dashboard_model');
     }
 
-    // TAMPIL HALAMAN UPLOAD
+    // 🔼 TAMPIL HALAMAN UPLOAD
     public function upload() {
         $data['title'] = 'Upload File';
         $data['page']  = 'file/upload';
         $this->load->view('layouts/template', $data);
     }
 
-    // PROSES UPLOAD
+    // ⬆️ PROSES UPLOAD
     public function do_upload() {
         $upload_path = FCPATH . 'uploads/';
         if (!is_dir($upload_path)) {
@@ -71,7 +77,7 @@ class File extends CI_Controller {
         redirect('dashboard');
     }
 
-    // TAMPIL HALAMAN EDIT
+    // ✏️ TAMPIL HALAMAN EDIT
     public function edit($id) {
         $file = $this->Dashboard_model->get_file_by_id($id);
         if (!$file) {
@@ -84,7 +90,7 @@ class File extends CI_Controller {
         $this->load->view('layouts/template', $data);
     }
 
-    // PROSES UPDATE FILE
+    // 🔄 PROSES UPDATE FILE
     public function update($id) {
         $file_lama = $this->Dashboard_model->get_file_by_id($id);
         if (!$file_lama) {
@@ -139,7 +145,7 @@ class File extends CI_Controller {
         redirect('dashboard');
     }
 
-    // HAPUS FILE
+    // ❌ HAPUS FILE
     public function delete($id) {
         $file = $this->Dashboard_model->get_file_by_id($id);
         if ($file) {
@@ -155,7 +161,23 @@ class File extends CI_Controller {
         redirect('dashboard');
     }
 
-    // AJAX FILTER (khusus air limbah)
+    // 🔍 PENCARIAN FILE (Fitur Search)
+    public function search() {
+        $keyword = $this->input->get('q');
+        $data['title']   = 'File Search';
+        $data['page']    = 'file/search';
+        $data['keyword'] = $keyword;
+
+        if (!empty($keyword)) {
+            $data['results'] = $this->Dashboard_model->search_file($keyword);
+        } else {
+            $data['results'] = [];
+        }
+
+        $this->load->view('layouts/template', $data);
+    }
+
+    // 🔃 AJAX FILTER (khusus air limbah dan lainnya)
     public function filter_data() {
         $subkategori = $this->input->get('subkategori');
         $tahun       = $this->input->get('tahun');

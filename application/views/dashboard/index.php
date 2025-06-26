@@ -1,5 +1,3 @@
-<?php defined('BASEPATH') or exit('No direct script access allowed'); ?>
-
 <style>
   .custom-box {
     border-radius: 16px;
@@ -7,11 +5,18 @@
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
     color: #fff;
     position: relative;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 16px 20px;
   }
+
   .custom-box:hover {
     transform: translateY(-6px);
     box-shadow: 0 18px 30px rgba(0, 0, 0, 0.15);
   }
+
   .custom-box.bg-info { background: linear-gradient(135deg, #17a2b8, #0d6efd); }
   .custom-box.bg-success { background: linear-gradient(135deg, #28a745, #218838); }
   .custom-box.bg-warning { background: linear-gradient(135deg, #ffc107, #fd7e14); }
@@ -19,7 +24,55 @@
   .custom-box.bg-secondary { background: linear-gradient(135deg, #6c757d, #5a6268); }
   .custom-box.bg-primary { background: linear-gradient(135deg, #007bff, #0056b3); }
 
-  .wrapper-container { position: relative; }
+  .custom-box h4 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .custom-box p {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .custom-box i.fa-3x {
+    opacity: 0.2;
+    position: absolute;
+    bottom: 12px;
+    right: 16px;
+  }
+
+  .wrapper-container {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .wrapper-container .btn {
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    white-space: nowrap;
+    max-width: 100%;
+    text-overflow: ellipsis;
+  }
+
+  /* Untuk tombol-tombol vertikal (khusus Perizinan) */
+  .subkategori-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .subkategori-vertical .btn {
+    width: 100%;
+    text-align: center;
+  }
+
   .tahun-wrapper {
     position: absolute;
     top: -170%;
@@ -38,13 +91,15 @@
     z-index: 9999;
     min-width: 250px;
   }
+
   .tahun-wrapper.show {
     opacity: 1;
     transform: translateX(-50%) scale(1);
     pointer-events: auto;
   }
+
   .tahun-badge {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     padding: 4px 10px;
     margin: 4px;
     border-radius: 20px;
@@ -57,12 +112,14 @@
     display: inline-block;
     text-decoration: none;
   }
+
   .tahun-badge:hover, .tahun-badge.active {
     background-color: #28a745;
     color: #fff;
     transform: scale(1.05);
   }
 </style>
+
 
 <div class="content-header">
   <div class="container-fluid">
@@ -227,6 +284,13 @@
         const endYear = 2025;
 
         let html = '';
+
+        // Tombol ALL di atas tahun
+        let allUrl = `<?= base_url('dashboard') ?>?jenis=${encodeURIComponent(data.jenis)}`;
+        if (data.subkategori) allUrl += `&subkategori=${encodeURIComponent(data.subkategori)}`;
+        html += `<a href="${allUrl}" class="tahun-badge" style="background:#343a40;color:#fff;">ALL</a>`;
+
+        // Tombol Tahun
         for (let y = startYear; y <= endYear; y++) {
           let url = `<?= base_url('dashboard') ?>?tahun=${y}&jenis=${encodeURIComponent(data.jenis)}`;
           if (data.subkategori) url += `&subkategori=${encodeURIComponent(data.subkategori)}`;
