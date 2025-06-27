@@ -9,7 +9,6 @@ class Dashboard_model extends CI_Model {
     public function get_summary() {
         $summary = [];
 
-        // Daftar kategori dan key tampilan kotak
         $kategori = [
             'Air Bersih'       => 'air_bersih',
             'Air Limbah'       => 'air_limbah',
@@ -103,7 +102,6 @@ class Dashboard_model extends CI_Model {
         }
 
         if (!empty($tahun)) {
-            // Khusus kategori tertentu pakai tahun_konstruksi
             switch ($jenis) {
                 case 'Jasa Konstruksi':
                 case 'Drainase':
@@ -131,5 +129,35 @@ class Dashboard_model extends CI_Model {
      */
     public function filter_jasa_konstruksi_by_tahun($tahun) {
         return $this->get_filtered_by_jenis('Jasa Konstruksi', '', $tahun);
+    }
+
+    /**
+     * Pencarian file berdasarkan nama_paket dan/atau tahun
+     */
+    public function cari_file($nama_paket = '', $tahun = '') {
+        $this->db->from('file_uploads');
+
+        if (!empty($nama_paket) && !empty($tahun)) {
+            $this->db->group_start();
+                $this->db->like('nama_paket', $nama_paket);
+            $this->db->group_end();
+
+            $this->db->group_start();
+                $this->db->where('tahun', $tahun);
+                $this->db->or_where('tahun_konstruksi', $tahun);
+            $this->db->group_end();
+
+        } elseif (!empty($nama_paket)) {
+            $this->db->like('nama_paket', $nama_paket);
+
+        } elseif (!empty($tahun)) {
+            $this->db->group_start();
+                $this->db->where('tahun', $tahun);
+                $this->db->or_where('tahun_konstruksi', $tahun);
+            $this->db->group_end();
+        }
+
+        $this->db->order_by('id', 'DESC');
+        return $this->db->get()->result();
     }
 }

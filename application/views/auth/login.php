@@ -62,16 +62,16 @@
     }
 
     .btn-primary {
-    background-color: transparent;
-    border: 2px solid #ffffff;
-    color: #fff;
-    transition: 0.3s ease;
+      background-color: transparent;
+      border: 2px solid #ffffff;
+      color: #fff;
+      transition: 0.3s ease;
     }
 
     .btn-primary:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    border-color: #fff;
-    color: #fff;
+      background-color: rgba(255, 255, 255, 0.15);
+      border-color: #fff;
+      color: #fff;
     }
 
     .alert {
@@ -120,5 +120,12 @@
   <script src="<?= base_url('aset/plugins/jquery/jquery.min.js') ?>"></script>
   <script src="<?= base_url('aset/plugins/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
   <script src="<?= base_url('aset/dist/js/adminlte.min.js') ?>"></script>
+
+  <!-- 🔁 Fade out alert otomatis -->
+  <script>
+    setTimeout(() => {
+      $('.alert').fadeOut('slow');
+    }, 3000);
+  </script>
 </body>
 </html>

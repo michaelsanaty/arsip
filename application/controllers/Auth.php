@@ -21,7 +21,12 @@ class Auth extends CI_Controller {
         'nama' => 'Admin',
         'logged_in' => true
       ]);
-      redirect('dashboard'); // halaman tujuan setelah login
+
+      // 🔁 Cek apakah ada halaman tujuan sebelumnya
+      $redirect = $this->session->userdata('redirect_after_login') ?: 'dashboard';
+      $this->session->unset_userdata('redirect_after_login');
+      redirect($redirect); // Kembali ke halaman tujuan
+
     } else {
       $this->session->set_flashdata('error', 'Nama atau sandi salah!');
       redirect('auth');
