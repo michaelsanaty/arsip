@@ -8,23 +8,23 @@
   <link rel="stylesheet" href="<?= base_url('aset/plugins/fontawesome-free/css/all.min.css') ?>">
   <link rel="stylesheet" href="<?= base_url('aset/dist/css/adminlte.min.css') ?>">
   <script src="<?= base_url('aset/plugins/jquery/jquery.min.js') ?>"></script>
+  <script src="<?= base_url('aset/plugins/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
+
   <style>
     body {
       background-color: #f4f6f9;
-      margin: 0;
-      padding: 0;
     }
 
     .card-wrapper {
-      max-width: 800px;
+      max-width: 900px;
       margin: 40px auto;
       padding: 0 15px;
     }
 
     .card-body-scrollable {
-      max-height: 80vh;
+      max-height: 85vh;
       overflow-y: auto;
-      padding-right: 15px;
+      padding-right: 10px;
     }
 
     .floating-back-btn {
@@ -37,6 +37,17 @@
     iframe {
       border: 1px solid #ccc;
       border-radius: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .card-header h4 {
+        font-size: 1.2rem;
+        text-align: center;
+      }
+
+      .btn-block {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -95,45 +106,45 @@
         </div>
 
         <div class="form-group">
-          <label>Nama Paket</label>
+          <label><i class="fas fa-pen-nib mr-1"></i> Nama Paket</label>
           <input type="text" class="form-control" name="nama_paket" value="<?= $file->nama_paket ?>" required>
         </div>
 
         <div class="form-group">
-          <label>Sumber Dana</label>
+          <label><i class="fas fa-money-bill-wave mr-1"></i> Sumber Dana</label>
           <input type="text" class="form-control" name="sumber_dana" value="<?= $file->sumber_dana ?>" required>
         </div>
 
         <div class="form-row">
           <div class="form-group col-md-6">
-            <label>Nilai Paket</label>
+            <label><i class="fas fa-coins mr-1"></i> Nilai Paket</label>
             <input type="number" class="form-control" name="nilai_paket" value="<?= $file->nilai_paket ?>" required>
           </div>
           <div class="form-group col-md-6">
-            <label>Nilai Pagu</label>
+            <label><i class="fas fa-cash-register mr-1"></i> Nilai Pagu</label>
             <input type="number" class="form-control" name="nilai_pagu" value="<?= $file->nilai_pagu ?>" required>
           </div>
         </div>
 
         <div class="form-group">
-          <label>Tanggal Upload</label>
+          <label><i class="fas fa-calendar-day mr-1"></i> Tanggal Upload</label>
           <input type="date" class="form-control" name="tanggal" value="<?= $file->tgl_upload ?>" required>
         </div>
 
         <div class="form-group">
-          <label>Volume</label>
+          <label><i class="fas fa-layer-group mr-1"></i> Volume</label>
           <input type="text" class="form-control" name="volume" value="<?= $file->volume ?>" required>
         </div>
 
         <div class="form-group">
-          <label>File (kosongkan jika tidak diganti)</label>
+          <label><i class="fas fa-file-upload mr-1"></i> File (kosongkan jika tidak diganti)</label>
           <input type="file" name="file" class="form-control-file">
           <?php if (!empty($file->file_upload)): ?>
             <small class="text-muted">File sekarang: <strong><?= $file->file_upload ?></strong></small>
           <?php endif; ?>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-block">
+        <button type="submit" class="btn btn-primary btn-block font-weight-bold">
           <i class="fas fa-save mr-2"></i> Simpan Perubahan
         </button>
 
@@ -194,6 +205,7 @@
         subkategoriSelect.append(`<option value="${sub}" ${selected}>${sub}</option>`);
       });
       subkategoriGroup.show();
+
       if (jenis === 'Perizinan') {
         tahunPerizinanGroup.show();
       } else {
@@ -210,5 +222,6 @@
     });
   });
 </script>
+
 </body>
 </html>

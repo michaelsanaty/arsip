@@ -21,13 +21,12 @@
       position: relative;
     }
 
-    /* 🔹 TOP NAVIGATION */
     .top-nav {
       position: absolute;
       top: 50px;
       right: 100px;
       display: flex;
-      gap: 80px; /* ~2cm antar menu */
+      gap: 80px;
       z-index: 10;
     }
 
@@ -71,7 +70,7 @@
       padding: 12px 15px;
       box-shadow: 2px 2px 10px rgba(0,0,0,0.12);
       font-size: 15px;
-       width: 75%;
+      width: 75%;
     }
 
     .form-control::placeholder {
@@ -98,18 +97,48 @@
       font-size: 14px;
     }
 
-    @media (max-width: 768px) {
+    @media screen and (max-width: 1440px) {
       .login-box {
-        width: 90%;
-        bottom: 40px;
-        right: 50%;
-        transform: translateX(50%);
+        right: 100px;
+        bottom: 60px;
+        width: 360px;
+      }
+    }
+
+    @media screen and (max-width: 1024px) {
+      .login-box {
+        right: 40px;
+        bottom: 50px;
+        width: 320px;
       }
 
       .top-nav {
+        right: 30px;
+        gap: 40px;
+      }
+
+      .form-control {
+        width: 100%;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+    }
+
+    @media screen and (max-width: 600px) {
+      .top-nav {
+        top: 20px;
+        flex-direction: column;
+        gap: 10px;
         right: 20px;
-        gap: 25px;
-        font-size: 14px;
+      }
+
+      .login-box {
+        left: 50%;
+        bottom: 30px;
+        transform: translateX(-50%);
+        width: 90%;
       }
     }
   </style>

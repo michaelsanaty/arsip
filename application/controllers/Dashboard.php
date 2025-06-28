@@ -16,26 +16,33 @@ class Dashboard extends CI_Controller {
         }
     }
 
+    /**
+     * Halaman utama Dashboard
+     */
     public function index() {
-        // Ambil data dari URL GET
-        $keyword     = $this->input->get('keyword', TRUE);
-        $jenis       = $this->input->get('jenis', TRUE);
-        $subkategori = $this->input->get('subkategori', TRUE);
-        $tahun       = $this->input->get('tahun', TRUE);
+        // Ambil filter dari parameter URL
+        $keyword     = $this->input->get('keyword', TRUE);        // Kata kunci pencarian
+        $jenis       = $this->input->get('jenis', TRUE);          // Jenis Paket (Air Limbah, Air Bersih, dsb)
+        $subkategori = $this->input->get('subkategori', TRUE);    // Subkategori (MCK, Tangki Septik, dll)
+        $tahun       = $this->input->get('tahun', TRUE);          // Tahun atau Tahun Konstruksi
 
-        $data['title']   = 'Dashboard';
-        $data['page']    = 'dashboard/index';
-        $data['summary'] = $this->Dashboard_model->get_summary();
-
-        // Ambil data file sesuai filter pencarian
-        $data['files'] = $this->Dashboard_model->get_filtered_files($keyword, $jenis, $subkategori, $tahun);
+        // Siapkan data untuk dikirim ke view
+        $data = [
+            'title'     => 'Dashboard',
+            'page'      => 'dashboard/index',
+            'summary'   => $this->Dashboard_model->get_summary(),
+            'files'     => $this->Dashboard_model->get_filtered_files($keyword, $jenis, $subkategori, $tahun),
+        ];
 
         $this->load->view('layouts/template', $data);
     }
 
-    // Endpoint JSON untuk filter AJAX (opsional)
+    /**
+     * Endpoint JSON untuk filter berdasarkan jenis, subkategori, dan tahun (digunakan jika pakai AJAX)
+     */
     public function filter($subkategori = '', $tahun = '', $jenis = '') {
         $result = $this->Dashboard_model->get_filtered_by_jenis($jenis, $subkategori, $tahun);
+
         $this->output
             ->set_content_type('application/json')
             ->set_output(json_encode($result));
