@@ -118,12 +118,6 @@
                 <p>Upload File</p>
               </a>
             </li>
-            <li class="nav-item">
-              <a href="<?= base_url('file/search') ?>" class="nav-link">
-                <i class="nav-icon fas fa-search"></i>
-                <p>File Search</p>
-              </a>
-            </li>
 
             <!-- 🔴 Tombol Logout -->
             <li class="nav-item">

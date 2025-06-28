@@ -102,15 +102,10 @@ class Dashboard_model extends CI_Model {
         }
 
         if (!empty($tahun)) {
-            switch ($jenis) {
-                case 'Jasa Konstruksi':
-                case 'Drainase':
-                    $this->db->where('tahun_konstruksi', $tahun);
-                    break;
-                default:
-                    $this->db->where('tahun', $tahun);
-                    break;
-            }
+            $this->db->group_start();
+            $this->db->where('tahun', $tahun);
+            $this->db->or_where('tahun_konstruksi', $tahun);
+            $this->db->group_end();
         }
 
         $this->db->order_by('id', 'DESC');
@@ -154,6 +149,40 @@ class Dashboard_model extends CI_Model {
             $this->db->group_start();
                 $this->db->where('tahun', $tahun);
                 $this->db->or_where('tahun_konstruksi', $tahun);
+            $this->db->group_end();
+        }
+
+        $this->db->order_by('id', 'DESC');
+        return $this->db->get()->result();
+    }
+
+    /**
+     * Final: Filter + Pencarian gabungan untuk Dashboard
+     */
+    public function get_filtered_files($keyword = null, $jenis = null, $subkategori = null, $tahun = null) {
+        $this->db->from('file_uploads');
+
+        if (!empty($keyword)) {
+            $this->db->group_start();
+            $this->db->like('nama_paket', $keyword);
+            $this->db->or_like('jenis_paket', $keyword);
+            $this->db->or_like('sumber_dana', $keyword);
+            $this->db->or_like('volume', $keyword);
+            $this->db->group_end();
+        }
+
+        if (!empty($jenis)) {
+            $this->db->where('jenis_paket', $jenis);
+        }
+
+        if (!empty($subkategori)) {
+            $this->db->where('subkategori', $subkategori);
+        }
+
+        if (!empty($tahun)) {
+            $this->db->group_start();
+            $this->db->where('tahun', $tahun);
+            $this->db->or_where('tahun_konstruksi', $tahun);
             $this->db->group_end();
         }
 

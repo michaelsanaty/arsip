@@ -5,39 +5,35 @@ class Dashboard extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
-
-        // Proteksi login
-        if (!$this->session->userdata('logged_in')) {
-            redirect('auth');
-        }
-
         $this->load->model('Dashboard_model');
         $this->load->helper(['url', 'form']);
+        $this->load->library('session');
+
+        // Proteksi login: redirect ke auth jika belum login
+        if (!$this->session->userdata('logged_in')) {
+            $this->session->set_userdata('redirect_after_login', current_url());
+            redirect('auth');
+        }
     }
 
     public function index() {
-        // Ambil filter dari URL
+        // Ambil data dari URL GET
+        $keyword     = $this->input->get('keyword', TRUE);
+        $jenis       = $this->input->get('jenis', TRUE);
         $subkategori = $this->input->get('subkategori', TRUE);
         $tahun       = $this->input->get('tahun', TRUE);
-        $jenis       = $this->input->get('jenis', TRUE); // Jenis = kategori utama (contoh: Bangunan Gedung)
 
         $data['title']   = 'Dashboard';
         $data['page']    = 'dashboard/index';
         $data['summary'] = $this->Dashboard_model->get_summary();
 
-        // Filter logika
-        if (!empty($jenis)) {
-            $data['files'] = $this->Dashboard_model->get_filtered_by_jenis($jenis, $subkategori, $tahun);
-        } elseif (!empty($subkategori) || !empty($tahun)) {
-            $data['files'] = $this->Dashboard_model->get_filtered($subkategori, $tahun);
-        } else {
-            $data['files'] = $this->Dashboard_model->get_all();
-        }
+        // Ambil data file sesuai filter pencarian
+        $data['files'] = $this->Dashboard_model->get_filtered_files($keyword, $jenis, $subkategori, $tahun);
 
         $this->load->view('layouts/template', $data);
     }
 
-    // Endpoint JSON (opsional AJAX)
+    // Endpoint JSON untuk filter AJAX (opsional)
     public function filter($subkategori = '', $tahun = '', $jenis = '') {
         $result = $this->Dashboard_model->get_filtered_by_jenis($jenis, $subkategori, $tahun);
         $this->output

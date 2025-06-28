@@ -194,57 +194,79 @@
     </div>
 
     <div class="card mt-4">
-      <div class="card-header bg-dark text-white">
-        <h5 class="mb-0 font-weight-bold"><i class="fas fa-folder-open mr-2"></i> Daftar File</h5>
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center flex-wrap">
+    <h5 class="mb-0 font-weight-bold">
+      <i class="fas fa-folder-open mr-2"></i> Daftar File
+    </h5>
+
+    <?= form_open('dashboard', ['method' => 'get', 'class' => 'form-inline']) ?>
+      <?php if ($this->input->get('jenis')): ?>
+        <input type="hidden" name="jenis" value="<?= htmlspecialchars($this->input->get('jenis')) ?>">
+      <?php endif; ?>
+      <?php if ($this->input->get('subkategori')): ?>
+        <input type="hidden" name="subkategori" value="<?= htmlspecialchars($this->input->get('subkategori')) ?>">
+      <?php endif; ?>
+      <?php if ($this->input->get('tahun')): ?>
+        <input type="hidden" name="tahun" value="<?= htmlspecialchars($this->input->get('tahun')) ?>">
+      <?php endif; ?>
+
+      <div class="input-group input-group-sm" style="max-width: 240px;">
+        <input type="text" name="keyword" class="form-control" placeholder="Cari file..." value="<?= $this->input->get('keyword') ?>">
+        <div class="input-group-append">
+          <button class="btn btn-light" type="submit">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
       </div>
-      <div class="card-body table-responsive">
-        <table class="table table-bordered table-striped table-hover">
-          <thead class="thead-dark text-center">
-            <tr>
-              <th>No</th>
-              <th>Jenis Paket</th>
-              <th>Nama Paket</th>
-              <th>Tahun</th>
-              <th>Sumber Dana</th>
-              <th>Nilai Paket</th>
-              <th>Nilai Pagu</th>
-              <th>Tanggal Upload</th>
-              <th>Volume</th>
-              <th>File</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if (!empty($files)): $no = 1; foreach ($files as $file): ?>
-              <tr>
-                <td class="text-center"><?= $no++ ?></td>
-                <td><?= $file->jenis_paket ?></td>
-                <td><?= $file->nama_paket ?></td>
-                <td><?= $file->tahun_konstruksi ?: $file->tahun ?></td>
-                <td><?= $file->sumber_dana ?></td>
-                <td><?= number_format($file->nilai_paket, 0, ',', '.') ?></td>
-                <td><?= number_format($file->nilai_pagu, 0, ',', '.') ?></td>
-                <td><?= date('d-m-Y', strtotime($file->tgl_upload)) ?></td>
-                <td><?= $file->volume ?></td>
-                <td>
-                  <?php if (!empty($file->file_upload)): ?>
-                    <a href="<?= base_url('uploads/' . $file->file_upload) ?>" target="_blank" class="btn btn-sm btn-primary">Lihat</a>
-                  <?php else: ?>
-                    <span class="text-muted">-</span>
-                  <?php endif; ?>
-                </td>
-                <td class="text-center">
-                  <a href="<?= site_url('file/edit/' . $file->id) ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
-                  <a href="<?= site_url('file/delete/' . $file->id) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus file ini?')"><i class="fas fa-trash"></i></a>
-                </td>
-              </tr>
-            <?php endforeach; else: ?>
-              <tr><td colspan="11" class="text-center">Belum ada data.</td></tr>
-            <?php endif; ?>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <?= form_close() ?>
+  </div>
+
+  <div class="card-body table-responsive">
+    <table class="table table-bordered table-striped table-hover">
+      <thead class="thead-dark text-center">
+        <tr>
+          <th>No</th>
+          <th>Jenis Paket</th>
+          <th>Nama Paket</th>
+          <th>Tahun</th>
+          <th>Sumber Dana</th>
+          <th>Nilai Paket</th>
+          <th>Nilai Pagu</th>
+          <th>Tanggal Upload</th>
+          <th>Volume</th>
+          <th>File</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php if (!empty($files)): $no = 1; foreach ($files as $file): ?>
+          <tr>
+            <td class="text-center"><?= $no++ ?></td>
+            <td><?= $file->jenis_paket ?></td>
+            <td><?= $file->nama_paket ?></td>
+            <td><?= $file->tahun_konstruksi ?: $file->tahun ?></td>
+            <td><?= $file->sumber_dana ?></td>
+            <td><?= number_format($file->nilai_paket, 0, ',', '.') ?></td>
+            <td><?= number_format($file->nilai_pagu, 0, ',', '.') ?></td>
+            <td><?= date('d-m-Y', strtotime($file->tgl_upload)) ?></td>
+            <td><?= $file->volume ?></td>
+            <td>
+              <?php if (!empty($file->file_upload)): ?>
+                <a href="<?= base_url('uploads/' . $file->file_upload) ?>" target="_blank" class="btn btn-sm btn-primary">Lihat</a>
+              <?php else: ?>
+                <span class="text-muted">-</span>
+              <?php endif; ?>
+            </td>
+            <td class="text-center">
+              <a href="<?= site_url('file/edit/' . $file->id) ?>" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></a>
+              <a href="<?= site_url('file/delete/' . $file->id) ?>" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus file ini?')"><i class="fas fa-trash"></i></a>
+            </td>
+          </tr>
+        <?php endforeach; else: ?>
+          <tr><td colspan="11" class="text-center">Belum ada data.</td></tr>
+        <?php endif; ?>
+      </tbody>
+    </table>
   </div>
 </div>
 
